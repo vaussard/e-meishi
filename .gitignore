@@ -1,0 +1,14 @@
+# West-managed workspace content (fetched by `west update`, not versioned here)
+/.west/
+/zephyr/
+/modules/
+
+# Build outputs
+/build/
+**/build/
+
+# Python venv
+.venv/
+
+# User
+*.swp

@@ -1,0 +1,19 @@
+manifest:
+  version: "1.2"
+
+  remotes:
+    - name: zephyrproject-rtos
+      url-base: https://github.com/zephyrproject-rtos
+
+  projects:
+    - name: zephyr
+      remote: zephyrproject-rtos
+      revision: main
+      import:
+        # Only pull in the HAL and modules that are needed
+        name-allowlist:
+          - cmsis_6
+          - hal_stm32
+
+  self:
+    path: manifest
