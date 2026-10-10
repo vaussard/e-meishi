@@ -84,6 +84,7 @@
 	};
 
 	aliases {
+		spi-flash0 = &is25lp128;
 		led0 = &yellow_led_1;
 		pwm-led0 = &yellow_pwm_led1;
 		rtc = &rtc;
@@ -238,4 +239,48 @@ zephyr_udc0: &usb {
 	clocks = <&rcc STM32_CLOCK(APB3, 11)>,
 		 <&rcc STM32_SRC_LSI LPTIM1_SEL(1)>;
 	status = "okay";
+};
+
+&xspi1 {
+	pinctrl-0 = <&octospi1_ncs_pa4
+		     &octospi1_io0_pb1 &octospi1_io1_pb0
+		     &octospi1_io2_pa7 &octospi1_io3_pa6
+		     &octospi1_clk_pb10>;
+	pinctrl-names = "default";
+	clock-frequency = <DT_FREQ_M(48)>;
+	/* not a PSRAM; do not release nCS on aligned boundaries (it would cut page programs) */
+	st,csbound = <0>;
+	status = "okay";
+
+	is25lp128: qspi-nor-flash@0 {
+		compatible = "jedec,nor";
+		reg = <0>;
+
+		/* TODO: enable DTR */
+		size = <DT_SIZE_M(128)>; /* 128 Mbits */
+		mspi-max-frequency = <DT_FREQ_M(48)>;
+		mspi-io-mode = "MSPI_IO_MODE_QUAD_1_4_4";
+		mspi-data-rate = "MSPI_DATA_RATE_SINGLE";
+		mspi-hardware-ce-num = <0>;
+		read-command = <0xeb>; /* FRQIO 1-4-4 */
+		write-command = <0x32>; /* PPQ 1-1-4 */
+		write-io-mode = "MSPI_IO_MODE_QUAD_1_1_4";
+		quad-enable-requirements = "S1B6"; /* QE = SR1 bit 6 */
+		command-length = "INSTR_1_BYTE";
+		address-length = "ADDR_3_BYTE";
+		tx-dummy = <0>;
+		rx-dummy = <6>;
+		jedec-id = [9d 60 18];
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "nor";
+				reg = <0x00000000 DT_SIZE_M(16)>;
+			};
+		};
+	};
 };

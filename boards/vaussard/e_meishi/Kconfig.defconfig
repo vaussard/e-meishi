@@ -1,0 +1,14 @@
+# SPDX-FileCopyrightText: © 2026 Florian Vaussard
+# SPDX-License-Identifier: Apache-2.0
+
+if BOARD_E_MEISHI
+
+if FLASH_MSPI_NOR
+
+# Use the 4 KiB sector erase of the IS25LP128 as the flash page size
+config FLASH_MSPI_NOR_LAYOUT_PAGE_SIZE
+	default 4096
+
+endif # FLASH_MSPI_NOR
+
+endif # BOARD_E_MEISHI
