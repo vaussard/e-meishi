@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: © 2026 Florian Vaussard
+# SPDX-License-Identifier: Apache-2.0
+
+board:
+  name: e_meishi
+  full_name: Florian's E-Meishi
+  vendor: vaussard
+  socs:
+    - name: stm32u375xx

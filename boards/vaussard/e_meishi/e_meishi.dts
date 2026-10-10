@@ -1,0 +1,241 @@
+/*
+ * Based on nucleo_u385rg_q:
+ * - Copyright (c) 2025 STMicroelectronics
+ *
+ * SPDX-FileCopyrightText: © 2026 Florian Vaussard
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/dts-v1/;
+#include <st/u3/stm32u375Xe.dtsi>
+#include <st/u3/stm32u375cetx-pinctrl.dtsi>
+
+/ {
+	model = "Florian's E-Meishi";
+	compatible = "vaussard,stm32u375ce-e-meishi";
+
+	chosen {
+		zephyr,code-partition = &slot0_partition;
+		zephyr,console = &usart1;
+		zephyr,flash = &flash0;
+		zephyr,shell-uart = &usart1;
+		zephyr,sram = &sram0;
+		zephyr,system-timer = &lptim1;
+	};
+
+	leds: leds {
+		compatible = "gpio-leds";
+
+		yellow_led_1: led_1 {
+			gpios = <&gpioa 2 GPIO_ACTIVE_HIGH>;
+			label = "D1";
+		};
+		yellow_led_2: led_2 {
+			gpios = <&gpioa 3 GPIO_ACTIVE_HIGH>;
+			label = "D2";
+		};
+		yellow_led_3: led_3 {
+			gpios = <&gpiob 14 GPIO_ACTIVE_HIGH>;
+			label = "D3";
+		};
+		yellow_led_4: led_4 {
+			gpios = <&gpioa 10 GPIO_ACTIVE_HIGH>;
+			label = "D4";
+		};
+		yellow_led_5: led_5 {
+			gpios = <&gpiob 6 GPIO_ACTIVE_HIGH>;
+			label = "D5";
+		};
+		yellow_led_6: led_6 {
+			gpios = <&gpiob 8 GPIO_ACTIVE_HIGH>;
+			label = "D6";
+		};
+		yellow_led_7: led_7 {
+			gpios = <&gpiob 9 GPIO_ACTIVE_HIGH>;
+			label = "D7";
+		};
+	};
+
+	pwmleds: pwmleds {
+		compatible = "pwm-leds";
+		status = "okay";
+
+		yellow_pwm_led1: yellow_pwm_led1 {
+			pwms = <&pwm2 3 PWM_USEC(1000) PWM_POLARITY_NORMAL>;
+		};
+		yellow_pwm_led2: yellow_pwm_led2 {
+			pwms = <&pwm2 4 PWM_USEC(1000) PWM_POLARITY_NORMAL>;
+		};
+		yellow_pwm_led3: yellow_pwm_led3 {
+			pwms = <&pwm15 1 PWM_USEC(1000) PWM_POLARITY_NORMAL>;
+		};
+		yellow_pwm_led4: yellow_pwm_led4 {
+			pwms = <&pwm1 3 PWM_USEC(1000) PWM_POLARITY_NORMAL>;
+		};
+		yellow_pwm_led5: yellow_pwm_led5 {
+			pwms = <&pwm4 1 PWM_USEC(1000) PWM_POLARITY_NORMAL>;
+		};
+		yellow_pwm_led6: yellow_pwm_led6 {
+			pwms = <&pwm16 1 PWM_USEC(1000) PWM_POLARITY_NORMAL>;
+		};
+		yellow_pwm_led7: yellow_pwm_led7 {
+			pwms = <&pwm17 1 PWM_USEC(1000) PWM_POLARITY_NORMAL>;
+		};
+	};
+
+	aliases {
+		led0 = &yellow_led_1;
+		pwm-led0 = &yellow_pwm_led1;
+		rtc = &rtc;
+	};
+};
+
+&flash0 {
+	partitions {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		boot_partition: partition@0 {
+			compatible = "zephyr,mapped-partition";
+			label = "mcuboot";
+			reg = <0x00000000 DT_SIZE_K(64)>;
+		};
+
+		slot0_partition: partition@10000 {
+			compatible = "zephyr,mapped-partition";
+			label = "image-0";
+			reg = <0x00010000 DT_SIZE_K(216)>;
+		};
+
+		slot1_partition: partition@46000 {
+			compatible = "zephyr,mapped-partition";
+			label = "image-1";
+			reg = <0x00046000 DT_SIZE_K(216)>;
+		};
+
+		storage_partition: partition@7c000 {
+			compatible = "zephyr,mapped-partition";
+			label = "storage";
+			reg = <0x0007c000 DT_SIZE_K(16)>;
+		};
+	};
+};
+
+/* debug console */
+&usart1 {
+	pinctrl-0 = <&usart1_tx_pa9 &usart1_rx_pb7>;
+	pinctrl-names = "default";
+	current-speed = <115200>;
+	status = "okay";
+};
+
+&clk_hsi {
+	status = "okay";
+};
+
+&clk_hsi48 {
+	status = "okay";
+};
+
+&clk_msis {
+	status = "okay";
+	msi-range = <1>; /* 48MHz */
+};
+
+&rcc {
+	clocks = <&clk_msis>;
+	clock-frequency = <DT_FREQ_M(48)>;
+	ahb-prescaler = <1>;
+	apb1-prescaler = <1>;
+	apb2-prescaler = <1>;
+	apb3-prescaler = <1>;
+};
+
+&clk_lsi {
+	status = "okay";
+};
+
+&rtc {
+	clocks = <&rcc STM32_CLOCK(APB1, 30)>,
+		 <&rcc STM32_SRC_LSI RTC_SEL(2)>;
+	status = "okay";
+};
+
+zephyr_udc0: &usb {
+	pinctrl-0 = <&usb_dm_pa11 &usb_dp_pa12>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&timers1 {
+	st,prescaler = <47>; /* 48 MHz / (47 + 1) = 1 MHz */
+	status = "okay";
+
+	pwm1: pwm {
+		pinctrl-0 = <&tim1_ch3_pa10>;
+		pinctrl-names = "default";
+		status = "okay";
+	};
+};
+
+&timers2 {
+	st,prescaler = <47>; /* 48 MHz / (47 + 1) = 1 MHz */
+	status = "okay";
+
+	pwm2: pwm {
+		pinctrl-0 = <&tim2_ch3_pa2 &tim2_ch4_pa3>;
+		pinctrl-names = "default";
+		status = "okay";
+	};
+};
+
+&timers4 {
+	st,prescaler = <47>; /* 48 MHz / (47 + 1) = 1 MHz */
+	status = "okay";
+
+	pwm4: pwm {
+		pinctrl-0 = <&tim4_ch1_pb6>;
+		pinctrl-names = "default";
+		status = "okay";
+	};
+};
+
+&timers15 {
+	st,prescaler = <47>; /* 48 MHz / (47 + 1) = 1 MHz */
+	status = "okay";
+
+	pwm15: pwm {
+		pinctrl-0 = <&tim15_ch1_pb14>;
+		pinctrl-names = "default";
+		status = "okay";
+	};
+};
+
+&timers16 {
+	st,prescaler = <47>; /* 48 MHz / (47 + 1) = 1 MHz */
+	status = "okay";
+
+	pwm16: pwm {
+		pinctrl-0 = <&tim16_ch1_pb8>;
+		pinctrl-names = "default";
+		status = "okay";
+	};
+};
+
+&timers17 {
+	st,prescaler = <47>; /* 48 MHz / (47 + 1) = 1 MHz */
+	status = "okay";
+
+	pwm17: pwm {
+		pinctrl-0 = <&tim17_ch1_pb9>;
+		pinctrl-names = "default";
+		status = "okay";
+	};
+};
+
+&lptim1 {
+	clocks = <&rcc STM32_CLOCK(APB3, 11)>,
+		 <&rcc STM32_SRC_LSI LPTIM1_SEL(1)>;
+	status = "okay";
+};

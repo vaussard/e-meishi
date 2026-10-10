@@ -1,0 +1,18 @@
+# SPDX-FileCopyrightText: © 2026 Florian Vaussard
+# SPDX-License-Identifier: Apache-2.0
+
+identifier: e_meishi
+name: E-Meishi
+vendor: vaussard
+type: mcu
+arch: arm
+ram: 256
+flash: 512
+toolchain:
+  - zephyr
+supported:
+  - gpio
+  - usart
+  - usb_device
+  - usbd
+  - pwm

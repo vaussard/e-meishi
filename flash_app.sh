@@ -3,7 +3,7 @@
 set -euo pipefail
 
 TARGET=app
-BOARD=nucleo_u575zi_q
+BOARD=e_meishi
 
 BUILD_DIR="build/$BOARD/$TARGET"
 
