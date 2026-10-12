@@ -17,3 +17,19 @@ west update
 west zephyr-export
 ```
 
+## Formatting the USB storage
+
+The flash is empty on first use. On Linux, plug the card in and find its
+block device (16 MB, model `e-meishi`):
+
+```bash
+lsblk -o NAME,SIZE,MODEL
+```
+
+Then format it as FAT, replacing `sdX` with the device found above:
+
+```bash
+sudo mkfs.vfat -n EMEISHI /dev/sdX
+```
+
+Unplug and replug the card for the host to mount it.
