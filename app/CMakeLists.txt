@@ -5,5 +5,6 @@ project(app)
 
 target_sources(app PRIVATE
 	src/main.c
+	src/leds_pwm.c
 	src/usb_msc.c
 )
